@@ -1,55 +1,51 @@
 'use client';
 
+import { useUser } from '@auth0/nextjs-auth0';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import oktaAuth from '@/lib/oktaClient';
 import { Button } from '@/components/ui/button';
 
 export default function Home() {
+  const { user, isLoading } = useUser();
   const router = useRouter();
 
   useEffect(() => {
-    oktaAuth.authStateManager.subscribe((authState) => {
-      if (authState.isAuthenticated) router.push('/profile');
-    });
-    oktaAuth.start();
-  }, [router]);
+    if (user) router.push('/profile');
+  }, [user, router]);
 
-  const handleLogin = async () => {
-    await oktaAuth.signInWithRedirect();
-  };
+  if (isLoading) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-white">
+        <p className="text-sm text-gray-400">Loading…</p>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-white px-6">
       <div className="w-full max-w-md text-center space-y-8">
 
-        {/* Badge */}
         <span className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-100 px-3 py-1 rounded-full tracking-wide uppercase">
           <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-          Powered by Okta
+          Powered by Auth0
         </span>
 
-        {/* Heading */}
         <div className="space-y-3">
           <h1 className="text-5xl font-semibold tracking-tight text-gray-950">
             Agent<span className="text-blue-600">Auth</span>
           </h1>
           <p className="text-base text-gray-500 leading-relaxed">
-            Humans and AI agents — both authenticated through Okta,
+            Humans and AI agents — both authenticated through Auth0,
             scoped differently, and fully auditable in one place.
           </p>
         </div>
 
-        {/* CTA */}
-        <Button
-          size="lg"
-          onClick={handleLogin}
-          className="w-full h-11 text-sm font-medium cursor-pointer"
-        >
-          Login with Okta
-        </Button>
+        <a href="/api/auth/login">
+          <Button size="lg" className="w-full h-11 text-sm font-medium cursor-pointer">
+            Login with Auth0
+          </Button>
+        </a>
 
-        {/* Feature pills */}
         <div className="flex items-center justify-center gap-3 flex-wrap">
           {[
             { icon: '🔐', label: 'OIDC + PKCE' },

@@ -76,7 +76,7 @@ export default function AgentsPage() {
     const res = await fetch('/api/agent/action', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token, action }),
+      body: JSON.stringify({ token, action, agentName: agent === 'reader' ? 'Agent Reader' : 'Agent Writer' }),
     });
     const data = await res.json();
     update(agent, { actionLoading: false, result: data });

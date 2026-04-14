@@ -36,7 +36,7 @@ export default function ProfilePage() {
             <p className="text-lg font-semibold text-gray-900">
               Agent<span className="text-blue-600">Auth</span>
             </p>
-            <p className="text-xs text-gray-400 mt-0.5">Human Identity — Screen 1 of 3</p>
+            <p className="text-xs text-gray-400 mt-0.5">Human Identity</p>
           </div>
           <a href="/auth/logout">
             <Button variant="outline" size="sm" className="cursor-pointer text-xs">

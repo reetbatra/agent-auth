@@ -40,7 +40,7 @@ export default function Home() {
           </p>
         </div>
 
-        <a href="/api/auth/login">
+        <a href="/auth/login">
           <Button size="lg" className="w-full h-11 text-sm font-medium cursor-pointer">
             Login with Auth0
           </Button>

@@ -38,7 +38,7 @@ export default function ProfilePage() {
             </p>
             <p className="text-xs text-gray-400 mt-0.5">Human Identity — Screen 1 of 3</p>
           </div>
-          <a href="/api/auth/logout">
+          <a href="/auth/logout">
             <Button variant="outline" size="sm" className="cursor-pointer text-xs">
               Sign out
             </Button>

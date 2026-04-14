@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import Navbar from '@/components/Navbar';
 import { Badge } from '@/components/ui/badge';
 
 type Filter = 'all' | 'human' | 'agent' | 'denied';
@@ -26,6 +25,13 @@ function timeAgo(dateStr: string) {
   if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
   return new Date(dateStr).toLocaleDateString();
 }
+
+const FILTERS: { key: Filter; label: string }[] = [
+  { key: 'all', label: 'All' },
+  { key: 'human', label: 'Human' },
+  { key: 'agent', label: 'Agent' },
+  { key: 'denied', label: 'Denied' },
+];
 
 export default function AuditPage() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
@@ -66,54 +72,32 @@ export default function AuditPage() {
     return true;
   });
 
-  const filters: { key: Filter; label: string }[] = [
-    { key: 'all', label: 'All' },
-    { key: 'human', label: 'Human' },
-    { key: 'agent', label: 'Agent' },
-    { key: 'denied', label: 'Denied' },
-  ];
-
   return (
-    <main className="min-h-screen bg-gray-50 py-10 px-6">
-      <div className="max-w-2xl mx-auto space-y-5">
-
-        {/* Nav */}
-        <div className="flex items-center justify-between">
-          <p className="text-lg font-semibold text-gray-900">
-            Agent<span className="text-blue-600">Auth</span>
-          </p>
-          <div className="flex gap-2">
-            <Link href="/profile">
-              <Button variant="outline" size="sm" className="text-xs cursor-pointer">Profile</Button>
-            </Link>
-            <Link href="/agents">
-              <Button variant="outline" size="sm" className="text-xs cursor-pointer">AI Agents</Button>
-            </Link>
-          </div>
-        </div>
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <main className="max-w-2xl mx-auto px-6 py-8 space-y-5">
 
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-start justify-between">
           <div>
             <h2 className="text-sm font-semibold text-gray-900">Identity Audit Log</h2>
             <p className="text-xs text-gray-400 mt-0.5">
-              {lastRefresh ? `Last updated ${timeAgo(lastRefresh.toISOString())} · auto-refreshes every 15s` : 'Loading…'}
+              {lastRefresh
+                ? `Updated ${timeAgo(lastRefresh.toISOString())} · auto-refreshes every 15s`
+                : 'Loading…'}
             </p>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="text-xs cursor-pointer"
+          <button
             onClick={fetchLogs}
-            disabled={loading}
+            className="text-xs text-gray-400 hover:text-gray-700 border border-gray-200 rounded-lg px-3 py-1.5 bg-white transition-colors cursor-pointer"
           >
             Refresh
-          </Button>
+          </button>
         </div>
 
         {/* Filters */}
         <div className="flex gap-2">
-          {filters.map((f) => (
+          {FILTERS.map((f) => (
             <button
               key={f.key}
               onClick={() => setFilter(f.key)}
@@ -124,73 +108,78 @@ export default function AuditPage() {
               }`}
             >
               {f.label}
+              {f.key !== 'all' && (
+                <span className="ml-1.5 opacity-60">
+                  {logs.filter((l) =>
+                    f.key === 'human' ? l.actorType === 'human'
+                    : f.key === 'agent' ? l.actorType === 'agent'
+                    : !l.success
+                  ).length}
+                </span>
+              )}
             </button>
           ))}
         </div>
 
-        {/* Log timeline */}
         {error && (
-          <div className="bg-red-50 border border-red-100 rounded-xl p-4 text-sm text-red-600">
-            {error}
+          <div className="bg-red-50 border border-red-100 rounded-xl p-4 text-xs text-red-600">{error}</div>
+        )}
+
+        {/* Denied hint */}
+        {filter === 'denied' && !loading && filtered.length === 0 && (
+          <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 text-xs text-amber-700 leading-relaxed">
+            No denied events yet. Go to <strong>AI Agents</strong>, authenticate Agent Reader, then click <strong>Write Resource</strong> — that will generate a denied event here.
           </div>
         )}
 
+        {/* Skeleton */}
         {loading && (
-          <div className="space-y-3">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="bg-white border border-gray-100 rounded-xl p-4 animate-pulse">
-                <div className="h-3 bg-gray-100 rounded w-1/3 mb-2" />
-                <div className="h-2 bg-gray-100 rounded w-1/2" />
+          <div className="space-y-2">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="bg-white border border-gray-100 rounded-xl p-4 animate-pulse flex gap-3">
+                <div className="w-6 h-6 rounded-full bg-gray-100 shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-3 bg-gray-100 rounded w-1/3" />
+                  <div className="h-2 bg-gray-100 rounded w-1/2" />
+                </div>
               </div>
             ))}
           </div>
         )}
 
-        {!loading && filtered.length === 0 && (
+        {/* Events */}
+        {!loading && filtered.length > 0 && (
+          <div className="space-y-2">
+            {filtered.map((log) => (
+              <div key={log.id} className="bg-white border border-gray-100 rounded-xl px-4 py-3 flex items-start gap-3">
+                <span className="text-base mt-0.5 shrink-0">{log.actorType === 'human' ? '👤' : '🤖'}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-sm font-medium text-gray-800">{log.event}</span>
+                    <Badge variant={log.success ? 'secondary' : 'destructive'} className="text-[10px]">
+                      {log.success ? 'success' : 'denied'}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-0.5 truncate">
+                    {log.clientName && log.clientName !== log.actor
+                      ? `${log.actor} via ${log.clientName}`
+                      : log.actor}
+                    {log.ip ? ` · ${log.ip}` : ''}
+                  </p>
+                </div>
+                <span className="text-[10px] text-gray-300 shrink-0 mt-1 tabular-nums">{timeAgo(log.timestamp)}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {!loading && filtered.length === 0 && filter !== 'denied' && (
           <div className="bg-white border border-gray-100 rounded-xl p-8 text-center">
             <p className="text-sm text-gray-400">No events found</p>
           </div>
         )}
 
-        {!loading && filtered.length > 0 && (
-          <div className="space-y-2">
-            {filtered.map((log) => (
-              <div
-                key={log.id}
-                className="bg-white border border-gray-100 rounded-xl px-4 py-3 flex items-start gap-3"
-              >
-                {/* Actor icon */}
-                <span className="text-lg mt-0.5 shrink-0">
-                  {log.actorType === 'human' ? '👤' : '🤖'}
-                </span>
-
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-medium text-gray-800">{log.event}</span>
-                    <Badge
-                      variant={log.success ? 'secondary' : 'destructive'}
-                      className="text-[10px]"
-                    >
-                      {log.success ? 'success' : 'failed'}
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-gray-400 mt-0.5 truncate">
-                    {log.clientName ? `${log.actor} via ${log.clientName}` : log.actor}
-                    {log.ip ? ` · ${log.ip}` : ''}
-                  </p>
-                </div>
-
-                {/* Timestamp */}
-                <span className="text-[10px] text-gray-300 shrink-0 mt-1">
-                  {timeAgo(log.timestamp)}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }

@@ -46,18 +46,20 @@ export default function Home() {
           </Button>
         </a>
 
-        <div className="flex items-center justify-center gap-3 flex-wrap">
+        <div className="grid grid-cols-3 gap-3 pt-2">
           {[
-            { icon: '🔐', label: 'OIDC + PKCE' },
-            { icon: '🤖', label: 'M2M Agents' },
-            { icon: '📋', label: 'Audit Log' },
-          ].map(({ icon, label }) => (
-            <span
+            { icon: '🔐', label: 'OIDC + PKCE', sub: 'Human login' },
+            { icon: '🤖', label: 'M2M Agents', sub: 'AI identity' },
+            { icon: '📋', label: 'Audit Log', sub: 'Every event' },
+          ].map(({ icon, label, sub }) => (
+            <div
               key={label}
-              className="inline-flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-100 px-3 py-1.5 rounded-full"
+              className="flex flex-col items-center gap-1 bg-gray-50 border border-gray-100 rounded-xl py-3 px-2"
             >
-              {icon} {label}
-            </span>
+              <span className="text-xl">{icon}</span>
+              <span className="text-xs font-medium text-gray-700">{label}</span>
+              <span className="text-[10px] text-gray-400">{sub}</span>
+            </div>
           ))}
         </div>
 

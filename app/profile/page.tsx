@@ -3,6 +3,7 @@
 import { useUser } from '@auth0/nextjs-auth0';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,17 +33,20 @@ export default function ProfilePage() {
 
         {/* Nav */}
         <div className="flex items-center justify-between py-1">
-          <div>
-            <p className="text-lg font-semibold text-gray-900">
-              Agent<span className="text-blue-600">Auth</span>
-            </p>
-            <p className="text-xs text-gray-400 mt-0.5">Human Identity</p>
+          <p className="text-lg font-semibold text-gray-900">
+            Agent<span className="text-blue-600">Auth</span>
+          </p>
+          <div className="flex items-center gap-2">
+            <Link href="/agents">
+              <Button variant="outline" size="sm" className="cursor-pointer text-xs">AI Agents</Button>
+            </Link>
+            <Link href="/audit">
+              <Button variant="outline" size="sm" className="cursor-pointer text-xs">Audit Log</Button>
+            </Link>
+            <a href="/auth/logout">
+              <Button variant="outline" size="sm" className="cursor-pointer text-xs">Sign out</Button>
+            </a>
           </div>
-          <a href="/auth/logout">
-            <Button variant="outline" size="sm" className="cursor-pointer text-xs">
-              Sign out
-            </Button>
-          </a>
         </div>
 
         {/* Identity */}

@@ -5,6 +5,7 @@ import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { parseJwt } from '@/lib/utils';
 
 type AgentType = 'reader' | 'writer';
 type ActionType = 'read' | 'write';
@@ -15,15 +16,6 @@ interface AgentState {
   result: { allowed: boolean; reason: string } | null;
   actionLoading: boolean;
   showRawToken: boolean;
-}
-
-function parseJwt(token: string) {
-  try {
-    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-    return JSON.parse(atob(base64));
-  } catch {
-    return null;
-  }
 }
 
 const AGENTS: { type: AgentType; name: string; scopes: string[]; description: string }[] = [
@@ -58,7 +50,7 @@ export default function AgentsPage() {
     const res = await fetch('/api/agent/action', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token, action, agentName: agent === 'reader' ? 'Agent Reader' : 'Agent Writer' }),
+      body: JSON.stringify({ token, action, agentName: AGENTS.find((a) => a.type === agent)?.name }),
     });
     const data = await res.json();
     update(agent, { actionLoading: false, result: data });
@@ -99,7 +91,6 @@ export default function AgentsPage() {
               </div>
 
               <CardContent className="p-5 space-y-5">
-                {/* Step 1 */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -143,7 +134,6 @@ export default function AgentsPage() {
                   )}
                 </div>
 
-                {/* Step 2 */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <span className="w-5 h-5 rounded-full bg-gray-900 text-white text-[10px] flex items-center justify-center font-bold shrink-0">2</span>

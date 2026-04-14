@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import Navbar from '@/components/Navbar';
 import { Badge } from '@/components/ui/badge';
+import { timeAgo } from '@/lib/utils';
 
 type Filter = 'all' | 'human' | 'agent' | 'denied';
 
@@ -16,14 +17,6 @@ interface LogEntry {
   success: boolean;
   ip: string | null;
   clientName: string | null;
-}
-
-function timeAgo(dateStr: string) {
-  const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
-  if (diff < 60) return `${diff}s ago`;
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-  return new Date(dateStr).toLocaleDateString();
 }
 
 const FILTERS: { key: Filter; label: string }[] = [

@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server';
 import { getActionLog } from '@/lib/actionLog';
 
+let cachedMgmtToken: { token: string; expiresAt: number } | null = null;
+
 async function getManagementToken(): Promise<string> {
+  if (cachedMgmtToken && Date.now() < cachedMgmtToken.expiresAt) {
+    return cachedMgmtToken.token;
+  }
   const res = await fetch(`https://${process.env.AUTH0_DOMAIN}/oauth/token`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -13,6 +18,8 @@ async function getManagementToken(): Promise<string> {
     }),
   });
   const data = await res.json();
+  // Cache with a 60s buffer before actual expiry
+  cachedMgmtToken = { token: data.access_token, expiresAt: Date.now() + (data.expires_in - 60) * 1000 };
   return data.access_token;
 }
 

@@ -17,7 +17,6 @@ const FILE = path.join(process.cwd(), '.action-log.json');
 
 function readFile(): ActionLogEntry[] {
   try {
-    if (!fs.existsSync(FILE)) return [];
     return JSON.parse(fs.readFileSync(FILE, 'utf-8'));
   } catch {
     return [];
@@ -27,7 +26,9 @@ function readFile(): ActionLogEntry[] {
 function writeFile(entries: ActionLogEntry[]) {
   try {
     fs.writeFileSync(FILE, JSON.stringify(entries, null, 2));
-  } catch {}
+  } catch (err) {
+    console.error('[actionLog] write failed:', err);
+  }
 }
 
 export function appendActionLog(entry: Omit<ActionLogEntry, 'id' | 'timestamp'>) {

@@ -1,14 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { appendActionLog } from '@/lib/actionLog';
-
-function parseJwt(token: string) {
-  try {
-    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-    return JSON.parse(Buffer.from(base64, 'base64').toString('utf-8'));
-  } catch {
-    return null;
-  }
-}
+import { parseJwt } from '@/lib/utils';
 
 export async function POST(req: NextRequest) {
   const { token, action, agentName } = await req.json();

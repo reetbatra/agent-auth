@@ -6,10 +6,10 @@ export interface ActionLogEntry {
   timestamp: string;
   event: string;
   actor: string;
-  actorType: 'agent';
+  actorType: 'human' | 'agent';
   success: boolean;
   ip: string | null;
-  clientName: string;
+  clientName: string | null;
   code: string;
 }
 
@@ -27,16 +27,14 @@ function readFile(): ActionLogEntry[] {
 function writeFile(entries: ActionLogEntry[]) {
   try {
     fs.writeFileSync(FILE, JSON.stringify(entries, null, 2));
-  } catch {
-    // silently fail if can't write
-  }
+  } catch {}
 }
 
 export function appendActionLog(entry: Omit<ActionLogEntry, 'id' | 'timestamp'>) {
   const entries = readFile();
   entries.unshift({
     ...entry,
-    id: `action-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    id: `log-${Date.now()}-${Math.random().toString(36).slice(2)}`,
     timestamp: new Date().toISOString(),
   });
   writeFile(entries.slice(0, 200));

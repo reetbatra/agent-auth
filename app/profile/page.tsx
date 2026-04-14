@@ -15,6 +15,18 @@ export default function ProfilePage() {
     if (!isLoading && !user) router.push('/');
   }, [user, isLoading, router]);
 
+  useEffect(() => {
+    if (!user) return;
+    // Log the login event once per browser session
+    if (sessionStorage.getItem('login-logged')) return;
+    sessionStorage.setItem('login-logged', '1');
+    fetch('/api/user/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: user.name, email: user.email }),
+    });
+  }, [user]);
+
   if (isLoading || !user) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-gray-50">

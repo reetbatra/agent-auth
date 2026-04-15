@@ -73,8 +73,8 @@ export default function AgentsPage() {
         {AGENTS.map((agent) => {
           const state = states[agent.type];
           const payload = state.token ? parseJwt(state.token) : null;
-          const scopes: string[] = payload?.scope?.split(' ') ?? [];
-          const expiresIn = payload ? payload.exp - Math.floor(Date.now() / 1000) : null;
+          const scopes: string[] = ((payload?.scope as string) ?? '').split(' ').filter(Boolean);
+          const expiresIn = payload ? (payload.exp as number) - Math.floor(Date.now() / 1000) : null;
 
           return (
             <Card key={agent.type} className="shadow-none border-gray-200 overflow-hidden">

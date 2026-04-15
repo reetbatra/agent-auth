@@ -15,10 +15,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ allowed: false, reason: 'Invalid token' }, { status: 401 });
   }
 
-  const scopes: string[] = (payload.scope ?? '').split(' ').filter(Boolean);
+  const scopes: string[] = ((payload.scope as string) ?? '').split(' ').filter(Boolean);
   const requiredScope = action === 'write' ? 'data:write' : 'data:read';
   const allowed = scopes.includes(requiredScope);
-  const clientId = payload.sub ?? payload.azp ?? 'unknown';
+  const clientId = (payload.sub ?? payload.azp ?? 'unknown') as string;
 
   appendActionLog({
     event: allowed

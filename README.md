@@ -4,7 +4,7 @@ A portfolio demo showing unified human + AI agent identity management with Auth0
 
 Most identity demos only cover human login. AgentAuth treats AI agents as first-class identity holders, each with their own credentials, scopes, and audit trail, alongside regular users, all visible in one place.
 
-**Live demo:** _add your Vercel URL here_
+**Live demo:** [agent-auth-rouge.vercel.app](here)
 
 ---
 
